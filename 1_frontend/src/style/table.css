@@ -1,0 +1,17 @@
+.smallContaner {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    padding: 10px;
+
+}
+table{
+    display: flex;
+    flex-direction: row;
+}
+thead{
+    width: 100vh(100vh * 100%);
+    display: flex;
+    flex-direction: row;
+ background-color: aliceblue;
+}
