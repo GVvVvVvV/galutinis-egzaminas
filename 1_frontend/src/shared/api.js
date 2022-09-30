@@ -7,8 +7,7 @@ class API {
 
     async signup(userData) {
         const { data } = await axios.post(HOST + '/api/users', userData);
-        console.log("post data",data)
-        console.log("post userdata",userData)
+
         return data;
       }
 // get all appointments
@@ -16,7 +15,6 @@ class API {
 
 async getUsers() {
     const { data } = await axios.get(HOST + '/api/users');
-    console.log("get api", data)
     return data;
   }
 // delete appointment by id

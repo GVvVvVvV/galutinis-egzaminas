@@ -68,3 +68,315 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+getUser,
+updateUser,
+deleteUser,
+} from "../../redux/actions/userActions";
+
+import Button from "../Button/Button";
+
+import { TableContainer, StyledTable } from "./Table.style";
+
+const Table = () => {
+// state
+const [post, setPost] = useState([]);
+const [total, setTotal] = useState(10);
+const [page, setPage] = useState(1);
+const [state, setState] = useState(null);
+const [loader, setLoader] = useState(false);
+
+const dispatch = useDispatch();
+const { loading, user: client, error } = useSelector((state) => state.get);
+// side effects
+useEffect(() => {
+setLoader(true);
+if (!loader) {
+dispatch(getUser(page));
+setLoader(true);
+}
+if (client) {
+setState(client.paginatedUsers);
+setTotal(client.total);
+}
+}, [client, total, page, loader, dispatch]);
+// custom functions
+const UpdateUser = (e) => {
+const { userId } = e.target.dataset;
+
+    const trToUpdate = e.target.parentNode.parentNode;
+
+    const user = {
+      name: trToUpdate.children[0].innerText,
+      surname: trToUpdate.children[1].innerText,
+      email: trToUpdate.children[2].innerText,
+      date: trToUpdate.children[3].innerText,
+      time: trToUpdate.children[4].innerText,
+    };
+    dispatch(updateUser(userId, user));
+
+};
+
+const DeleteUser = async (e) => {
+const { userId } = e.target.dataset;
+
+    await dispatch(deleteUser(userId));
+
+    await dispatch(getUser(page));
+
+};
+
+const Pages = (item) => {
+setPage(item);
+dispatch(getUser(item));
+};
+
+return (
+<TableContainer>
+<StyledTable>
+<thead>
+<tr>
+<th className="name">Name</th>
+<th className="surname">Surname</th>
+<th>Email</th>
+<th>Date</th>
+<th>Time</th>
+<th className="btn">Update</th>
+<th className=" delete-button">Delete</th>
+</tr>
+</thead>
+<tbody>
+{loading && (
+<tr>
+<td>Loading...</td>
+</tr>
+)}
+{error && (
+<tr>
+<td>{error}</td>
+</tr>
+)}
+{state &&
+state.map((item) => (
+<tr key={item._id} data-id={item._id}>
+<td
+                  contentEditable={true}
+                  suppressContentEditableWarning={true}
+                >
+{item.name}
+</td>
+<td
+                  contentEditable={true}
+                  suppressContentEditableWarning={true}
+                >
+{item.surname}
+</td>
+<td
+                  contentEditable={true}
+                  suppressContentEditableWarning={true}
+                >
+{item.email}
+</td>
+<td
+                  contentEditable={true}
+                  suppressContentEditableWarning={true}
+                >
+{item.date}
+</td>
+<td
+                  contentEditable={true}
+                  suppressContentEditableWarning={true}
+                >
+{item.time}
+</td>
+<td className="btn">
+<Button text="Update" action={UpdateUser} userId={item._id} />
+</td>
+<td className="btn">
+<Button text="Delete" action={DeleteUser} userId={item._id} />
+</td>
+</tr>
+))}
+</tbody>
+</StyledTable>
+
+      <>
+        {!total ? (
+          <p>loading...</p>
+        ) : (
+          <div>
+            {Array.from(Array(Math.ceil(total / 10)).keys()).map((item) => (
+              <Button
+                key={item}
+                text={item + 1}
+                action={() => Pages(item + 1)}
+              />
+            ))}
+          </div>
+        )}
+      </>
+    </TableContainer>
+
+);
+};
+export default Table;
+
+// import { useState, useEffect } from "react";
+// import { useDispatch, useSelector } from "react-redux";
+// import { getUser, updateUser, deleteUser } from "../redux/actions/userActions";
+// import "../style/table.css";
+// import Button from "./Button/Button";
+// const Table = () => {
+// // state
+// const [total, setTotal] = useState(null);
+// const [data, setData] = useState(null);
+// const [Loader, setLoader] = useState(true);
+// const [page, setPage] = useState(1);
+
+// const dispatch = useDispatch();
+// const { loading, user: client, error } = useSelector((state) => state.get);
+// // console.log("from app,js", data);
+// //
+// // useEffect
+// useEffect(() => {
+// if (!Loader) {
+// dispatch(getUser(page));
+// setLoader(true);
+// }
+// if (client) {
+// setData(client.user);
+// setTotal(client.total);
+// }
+// }, [client, total, page, dispatch]);
+
+// // funtion
+// const UpdateUser = (e) => {
+// const { userId } = e.target.dataset;
+
+// const trToUpdate = e.target.parentNode.parentNode;
+
+// const user = {
+// name: trToUpdate.children[0].innerText,
+// surname: trToUpdate.children[1].innerText,
+
+// email: trToUpdate.children[2].innerText,
+// date: trToUpdate.children[3].innerText,
+// time: trToUpdate.children[4].innerText,
+// };
+// dispatch(updateUser(userId, user));
+// };
+// const DeleteUser = async (e) => {
+// const { userId } = e.target.dataset;
+
+// await dispatch(deleteUser(userId));
+
+// await dispatch(getUser(page));
+// console.log("asd");
+// };
+// return (
+// <main>
+// <h1>Appoint users Page</h1>
+
+// <table className="container">
+// <thead className="thead">
+// <tr>
+// <th className="name">Name</th>
+// <th className="surname">Surname</th>
+// <th>Email</th>
+// <th>Date</th>
+// <th>Time</th>
+// <th className="th-btn">Update</th>
+// <th className="th-btn th-delete">Delete</th>
+// </tr>
+// </thead>
+// <tbody>
+// {loading && (
+// <tr>
+// <td>Loading...</td>
+// </tr>
+// )}
+// {error && (
+// <tr>
+// <td>{error}</td>
+// </tr>
+// )}
+// {data &&
+// data.map((item) => (
+// <tr key={item._id} data-id={item._id}>
+//
+// <td
+// contentEditable={true}
+// suppressContentEditableWarning={true}
+// >
+// {item.email}
+// </td>
+// <td
+// contentEditable={true}
+// suppressContentEditableWarning={true}
+// >
+// {item.date}
+// </td>
+// <td
+// contentEditable={true}
+// suppressContentEditableWarning={true}
+// >
+// {item.time}
+// </td>
+// <td className="td-btn">
+// <Button text="Update" action={UpdateUser} userId={item._id} />
+// </td>
+// <td className="td-btn">
+// <Button text="Delete" action={DeleteUser} userId={item._id} />
+// </td>
+// </tr>
+// ))}
+// </tbody>
+
+// {/_ <div className="smallContaner">
+// {data &&
+// data.map((user) => (
+// <tbody className="tbody" style={{ display: "flex" }}>
+// <tr>{user.name}</tr>
+// </tbody>
+// ))}
+// </div>
+// <div className="smallContaner">
+// {data &&
+// data.map((user) => (
+// <tbody className="tbody" style={{ display: "flex" }}>
+// <tr>{user.surname}</tr>
+// </tbody>
+// ))}
+// </div>
+// <div className="smallContaner">
+// {data &&
+// data.map((user) => (
+// <tbody className="tbody" style={{ display: "flex" }}>
+// <tr>{user.email}</tr>
+// </tbody>
+// ))}
+// </div>
+// <div className="smallContaner">
+// {data &&
+// data.map((user) => (
+// <tbody className="tbody" style={{ display: "flex" }}>
+// <tr>{user.date}</tr>
+// </tbody>
+// ))}
+// </div>
+// <div className="smallContaner">
+// {data &&
+// data.map((user) => (
+// <tbody className="tbody" style={{ display: "flex" }}>
+// <tr>{user.time}</tr>
+// </tbody>
+// ))}
+// </div>{" "} _/}
+// </table>
+// </main>
+// );
+// };
+
+// export default Table;
